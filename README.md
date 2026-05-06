@@ -5,6 +5,8 @@
 
 CS 420 — Programming Languages | Spring 2026
 
+**Authors:** Miguel Reese & Mark Gugg
+
 ---
 
 ## Overview

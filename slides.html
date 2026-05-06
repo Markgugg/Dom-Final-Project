@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SCRIPTOR — CS 420 Presentation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Raleway:wght@300;400;600;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0d0d0d; --gold: #f5c842; --text: #e8dcc8;
+      --muted: #9a8e7e; --dim: #444; --code-bg: #141414;
+      --border: #222; --green: #7ecf8e; --blue: #89b4fa;
+    }
+    html, body { width: 100%; height: 100%; background: var(--bg); color: var(--text); font-family: 'Raleway', sans-serif; overflow: hidden; }
+
+    .deck { width: 100%; height: 100%; position: relative; }
+
+    .slide {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      padding: 56px 80px 90px;
+      opacity: 0; pointer-events: none; transition: opacity 0.35s ease;
+    }
+    .slide.active { opacity: 1; pointer-events: all; }
+
+    .nav {
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+      display: flex; align-items: center; gap: 16px; z-index: 100;
+    }
+    .nav button {
+      background: #1a1a1a; border: 1px solid var(--border);
+      color: var(--text); font-family: 'Courier Prime', monospace;
+      font-size: 0.9rem; padding: 7px 18px; cursor: pointer; border-radius: 2px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .nav button:hover { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+    .counter { font-family: 'Courier Prime', monospace; font-size: 0.82rem; color: var(--dim); min-width: 64px; text-align: center; }
+
+    .progress { position: fixed; bottom: 0; left: 0; height: 3px; background: var(--gold); transition: width 0.35s ease; z-index: 100; }
+    .slide-label { position: fixed; top: 22px; left: 32px; font-family: 'Courier Prime', monospace; font-size: 0.72rem; color: var(--dim); letter-spacing: 0.1em; text-transform: uppercase; z-index: 100; }
+
+    h1.hero { font-family: 'Special Elite', serif; font-size: 6.5rem; letter-spacing: 0.4em; color: var(--gold); text-shadow: 0 0 60px rgba(245,200,66,0.25); line-height: 1; margin-bottom: 16px; }
+    h1 { font-family: 'Special Elite', serif; font-size: 2.8rem; letter-spacing: 0.1em; color: var(--gold); margin-bottom: 28px; line-height: 1.15; }
+    h2 { font-family: 'Special Elite', serif; font-size: 1.6rem; letter-spacing: 0.07em; color: var(--gold); margin-bottom: 14px; }
+    h3 { font-family: 'Special Elite', serif; font-size: 1.1rem; color: var(--gold); letter-spacing: 0.05em; margin-bottom: 8px; }
+    .subtitle { font-size: 1.2rem; color: var(--muted); font-style: italic; margin-bottom: 12px; letter-spacing: 0.04em; }
+    p { font-size: 1rem; line-height: 1.7; color: var(--text); max-width: 700px; text-align: center; }
+
+    ul { list-style: none; padding: 0; width: 100%; max-width: 740px; }
+    ul li { padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 0.97rem; line-height: 1.5; display: flex; align-items: flex-start; gap: 12px; }
+    ul li::before { content: '▶'; color: var(--gold); font-size: 0.6rem; margin-top: 5px; flex-shrink: 0; }
+    ul li:last-child { border-bottom: none; }
+
+    pre {
+      background: var(--code-bg); border: 1px solid var(--border); border-left: 3px solid var(--gold);
+      padding: 16px 20px; font-family: 'Courier Prime', monospace; font-size: 0.87rem;
+      line-height: 1.7; color: var(--text); border-radius: 2px; overflow-x: auto; width: 100%;
+    }
+    .terminal {
+      background: #0a0a0a; border: 1px solid #1a1a1a; border-left: 3px solid #2a2a2a;
+      padding: 16px 20px; font-family: 'Courier Prime', monospace; font-size: 0.83rem;
+      line-height: 1.65; color: #b8b0a0; border-radius: 2px; overflow-y: auto; width: 100%; max-height: 400px;
+    }
+    .terminal .cmd { color: var(--gold); margin-bottom: 6px; display: block; }
+
+    .kw  { color: var(--gold); font-weight: bold; }
+    .str { color: var(--green); }
+    .typ { color: var(--blue); }
+    .num { color: #fab387; }
+    .cmt { color: #444; font-style: italic; }
+    .mono { font-family: 'Courier Prime', monospace; color: var(--gold); }
+
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; width: 100%; max-width: 1160px; align-items: start; }
+    .panel { display: flex; flex-direction: column; gap: 8px; }
+    .panel-label { font-family: 'Courier Prime', monospace; font-size: 0.72rem; color: var(--dim); letter-spacing: 0.1em; text-transform: uppercase; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; max-width: 860px; }
+    th { text-align: left; color: var(--gold); font-family: 'Special Elite', serif; letter-spacing: 0.04em; padding: 9px 12px; border-bottom: 1px solid #333; }
+    td { padding: 8px 12px; border-bottom: 1px solid var(--border); color: #b8b0a0; }
+    td:first-child { font-family: 'Courier Prime', monospace; color: var(--gold); white-space: nowrap; }
+
+    .callout { background: #111; border: 1px solid #2a2a2a; border-left: 3px solid var(--gold); padding: 14px 18px; font-size: 0.92rem; line-height: 1.65; border-radius: 2px; width: 100%; max-width: 720px; }
+    .center { text-align: center; width: 100%; }
+    .full { width: 100%; max-width: 1160px; }
+
+    .arch { display: flex; gap: 14px; align-items: stretch; width: 100%; max-width: 900px; }
+    .arch-step { flex: 1; background: #111; border: 1px solid #2a2a2a; border-top: 3px solid var(--gold); padding: 18px 14px; border-radius: 2px; text-align: center; }
+    .arch-step p { font-size: 0.8rem; color: var(--muted); text-align: center; margin-top: 6px; }
+    .arch-arrow { display: flex; align-items: center; color: var(--gold); font-size: 1.4rem; }
+
+    .rule { border: none; border-top: 1px solid var(--border); width: 100%; margin: 20px 0; }
+    .badge { display: inline-block; background: #1a1a1a; border: 1px solid var(--border); border-left: 2px solid var(--gold); padding: 3px 10px; font-family: 'Courier Prime', monospace; font-size: 0.8rem; color: var(--gold); border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+<div class="slide-label" id="slide-label">CS 420 — Spring 2026</div>
+<div class="progress" id="progress"></div>
+
+<div class="deck" id="deck">
+
+  <!-- ── 1. TITLE ─────────────────────────────────── -->
+  <div class="slide active center">
+    <h1 class="hero">SCRIPTOR</h1>
+    <p class="subtitle">A Programming Language Written Like a Movie</p>
+    <div style="width:50px;height:1px;background:var(--gold);margin:18px auto;opacity:0.4;"></div>
+    <p style="font-size:0.95rem;color:var(--muted);">CS 420 — Programming Languages &nbsp;|&nbsp; Spring 2026</p>
+    <p style="font-size:0.82rem;color:var(--dim);margin-top:8px;font-family:'Courier Prime',monospace;font-style:italic;">"Every valid Scriptor program reads like a short film."</p>
+  </div>
+
+  <!-- ── 2. WHAT IS SCRIPTOR ────────────────────────── -->
+  <div class="slide">
+    <h1>What Is Scriptor?</h1>
+    <ul>
+      <li><strong>Name:</strong> Latin for <em>writer</em> — specifically a screenwriter. Programs are scripts; files use the <span class="mono">.scp</span> extension.</li>
+      <li><strong>Purpose:</strong> A general-purpose interpreted language where all syntax mirrors Hollywood screenplay format.</li>
+      <li><strong>Core idea:</strong> Variables are <em>characters</em>, functions are <em>scenes</em>, loops are <em>montages</em>, conditionals are <em>meanwhile cuts</em>.</li>
+      <li><strong>Goal:</strong> Make programming feel narrative and approachable — every program tells a story.</li>
+      <li><strong>Stack:</strong> Pure Python 3.8+, zero external dependencies. Run with <span class="mono">python3 interpreter.py &lt;file.scp&gt;</span></li>
+    </ul>
+  </div>
+
+  <!-- ── 3. PHILOSOPHY ─────────────────────────────── -->
+  <div class="slide center">
+    <h1>Language Philosophy</h1>
+    <p style="font-size:1.4rem;font-style:italic;color:var(--gold);font-family:'Special Elite',serif;margin-bottom:28px;">"The compiler is the audience."</p>
+    <div class="callout" style="text-align:left;">
+      <ul style="max-width:100%;">
+        <li>Code should be <strong>readable as prose</strong>, not just syntactically valid.</li>
+        <li>Every programming construct maps to a cinematic concept — nothing is arbitrary.</li>
+        <li>The language forces narrative structure: <em>setup</em> (OPENING CREDITS), <em>action</em> (DIRECTOR'S CUT), <em>resolution</em> (FADE OUT).</li>
+        <li>Beginner-friendly: no semicolons, no curly braces, no import boilerplate — just write the story.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ── 4. WHY I CREATED IT ───────────────────────── -->
+  <div class="slide center">
+    <h1>Why I Created It</h1>
+    <ul style="max-width:720px;text-align:left;">
+      <li>Most languages are designed around <strong>machine efficiency</strong> or <strong>mathematical formalism</strong> — not human storytelling.</li>
+      <li>Screenplay format is one of the most <strong>universally understood</strong> structured writing forms in the world.</li>
+      <li>Wanted to explore: <em>can syntax itself carry meaning beyond its logic?</em></li>
+      <li>Inspired by natural-language languages (Inform 7, COBOL) but with a cinematic twist instead of plain English.</li>
+      <li>Result: programs that are simultaneously <strong>valid code</strong> and <strong>readable narrative</strong>.</li>
+    </ul>
+  </div>
+
+  <!-- ── 5. LANGUAGE STYLE ──────────────────────────── -->
+  <div class="slide">
+    <h1>Language Style &amp; Design</h1>
+    <div class="split full">
+      <div class="panel">
+        <h3>Structural Rules</h3>
+        <ul>
+          <li>Every program opens with <span class="kw">SCRIPT: Title</span></li>
+          <li>Entry point is always <span class="kw">DIRECTOR'S CUT</span></li>
+          <li>Program ends with <span class="kw">FADE OUT.</span></li>
+          <li>Indentation defines scope — no braces needed</li>
+          <li>Multi-word keywords (<span class="kw">CUT TO</span>, <span class="kw">OPENING CREDITS</span>) read as natural phrases</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <div class="panel-label">program skeleton</div>
+        <pre><span class="kw">SCRIPT:</span> My Film
+
+<span class="kw">OPENING CREDITS</span>
+  <span class="kw">CHARACTER</span> title <span class="kw">AS</span> <span class="typ">NARRATOR</span> = <span class="str">"Scene One"</span>
+
+<span class="kw">SCENE:</span> OpeningAct
+  title <span class="kw">SAYS LINE</span>
+
+<span class="kw">DIRECTOR'S CUT</span>
+  <span class="kw">CUT TO</span> OpeningAct
+<span class="kw">FADE OUT.</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 6. KEYWORD REFERENCE ──────────────────────── -->
+  <div class="slide center">
+    <h1>Keyword Reference</h1>
+    <table>
+      <tr><th>Scriptor Keyword</th><th>Programming Concept</th></tr>
+      <tr><td>SCENE</td><td>Function / block definition</td></tr>
+      <tr><td>CHARACTER</td><td>Variable declaration</td></tr>
+      <tr><td>SAYS</td><td>print to stdout</td></tr>
+      <tr><td>SHOUTS</td><td>print to stderr (emphasis / errors)</td></tr>
+      <tr><td>MEANWHILE</td><td>if statement</td></tr>
+      <tr><td>OTHERWISE</td><td>else</td></tr>
+      <tr><td>MONTAGE</td><td>for loop</td></tr>
+      <tr><td>CUT TO</td><td>function call</td></tr>
+      <tr><td>DIRECTOR'S CUT</td><td>main() — program entry point</td></tr>
+      <tr><td>OPENING CREDITS</td><td>global variable scope</td></tr>
+      <tr><td>PLOT TWIST</td><td>try / catch error handling</td></tr>
+      <tr><td>FADE OUT.</td><td>end of program</td></tr>
+      <tr><td>RETURN</td><td>return a value from a scene</td></tr>
+    </table>
+  </div>
+
+  <!-- ── 7. DATA TYPES ─────────────────────────────── -->
+  <div class="slide center">
+    <h1>Data Types — Roles</h1>
+    <p style="margin-bottom:24px;">Every character in a film plays a <em>role</em>. In Scriptor, every variable has one too.</p>
+    <table style="max-width:680px;">
+      <tr><th>Role</th><th>Type</th><th>Example</th></tr>
+      <tr><td>HERO</td><td>Integer / Float — the numeric lead</td><td>42 &nbsp; 3.14</td></tr>
+      <tr><td>NARRATOR</td><td>String — tells the story</td><td>"Hello, World!"</td></tr>
+      <tr><td>VILLAIN</td><td>Boolean — creates conflict</td><td>VILLAIN_TRUE &nbsp; VILLAIN_FALSE</td></tr>
+      <tr><td>EXTRA</td><td>Null / Void — no value</td><td>(empty)</td></tr>
+    </table>
+    <div class="callout" style="margin-top:22px;text-align:left;max-width:680px;font-family:'Courier Prime',monospace;font-size:0.85rem;">
+      <span class="kw">CHARACTER</span> score <span class="kw">AS</span> <span class="typ">HERO</span> = <span class="num">100</span><br>
+      <span class="kw">CHARACTER</span> name <span class="kw">AS</span> <span class="typ">NARRATOR</span> = <span class="str">"Alice"</span><br>
+      <span class="kw">CHARACTER</span> passing <span class="kw">AS</span> <span class="typ">VILLAIN</span> = VILLAIN_TRUE
+    </div>
+  </div>
+
+  <!-- ── 8. PROGRAM 1: HELLO WORLD ─────────────────── -->
+  <div class="slide">
+    <h1>Program 1 — Hello World</h1>
+    <div class="split full">
+      <div class="panel">
+        <div class="panel-label">hello_world.scp</div>
+        <pre><span class="kw">SCRIPT:</span> Hello World
+
+<span class="kw">DIRECTOR'S CUT</span>
+  <span class="kw">CHARACTER</span> lead <span class="kw">AS</span> <span class="typ">NARRATOR</span> = <span class="str">"Hello World!"</span>
+  lead <span class="kw">SAYS LINE</span>
+<span class="kw">FADE OUT.</span></pre>
+      </div>
+      <div class="panel">
+        <h3>How It Works</h3>
+        <ul>
+          <li><span class="kw">SCRIPT:</span> declares the program title — like a film slate.</li>
+          <li><span class="kw">DIRECTOR'S CUT</span> is the entry point — execution starts here.</li>
+          <li><span class="kw">CHARACTER lead AS NARRATOR</span> declares a string variable named <em>lead</em>.</li>
+          <li><span class="kw">lead SAYS LINE</span> — the character <em>speaks</em> their value. Prints <span class="mono">lead: "Hello World!"</span></li>
+          <li><span class="kw">FADE OUT.</span> ends the program.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 9. PROGRAM 2: SIMPLE MATH ─────────────────── -->
+  <div class="slide">
+    <h1>Program 2 — Simple Math</h1>
+    <div class="split full">
+      <div class="panel">
+        <div class="panel-label">math.scp</div>
+        <pre><span class="kw">SCRIPT:</span> Simple Math
+
+<span class="kw">DIRECTOR'S CUT</span>
+  <span class="kw">CHARACTER</span> a <span class="kw">AS</span> <span class="typ">HERO</span> = <span class="num">10</span>
+  <span class="kw">CHARACTER</span> b <span class="kw">AS</span> <span class="typ">HERO</span> = <span class="num">5</span>
+  <span class="kw">CHARACTER</span> total <span class="kw">AS</span> <span class="typ">HERO</span> = a + b
+  <span class="kw">CHARACTER</span> diff  <span class="kw">AS</span> <span class="typ">HERO</span> = a - b
+  <span class="kw">SAYS</span> <span class="str">"Sum:"</span>
+  total <span class="kw">SAYS LINE</span>
+  <span class="kw">SAYS</span> <span class="str">"Difference:"</span>
+  diff <span class="kw">SAYS LINE</span>
+<span class="kw">FADE OUT.</span></pre>
+      </div>
+      <div class="panel">
+        <h3>How It Works</h3>
+        <ul>
+          <li><span class="typ">HERO</span> is the numeric type — integers and floats both use this role.</li>
+          <li>Arithmetic expressions (<span class="mono">a + b</span>, <span class="mono">a - b</span>) are evaluated at declaration time.</li>
+          <li><span class="kw">SAYS "Sum:"</span> is a bare print — no variable attached, just a string literal.</li>
+          <li><span class="mono">total SAYS LINE</span> prints the variable with its name label: <em>total: "15"</em></li>
+          <li>Supports <span class="mono">+ - * / %</span> and comparisons <span class="mono">== != &lt; &gt; &lt;= &gt;=</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 10. PROGRAM 3: PERSONAL GREETING ──────────── -->
+  <div class="slide">
+    <h1>Program 3 — Personal Greeting</h1>
+    <div class="split full">
+      <div class="panel">
+        <div class="panel-label">greeting.scp</div>
+        <pre><span class="kw">SCRIPT:</span> Personal Greeting
+
+<span class="kw">SCENE:</span> Greet (<span class="kw">CAST:</span> name <span class="kw">AS</span> <span class="typ">NARRATOR</span>)
+  <span class="kw">SAYS</span> <span class="str">"Welcome to the show,"</span>
+  name <span class="kw">SAYS LINE</span>
+
+<span class="kw">DIRECTOR'S CUT</span>
+  <span class="kw">CHARACTER</span> guest <span class="kw">AS</span> <span class="typ">NARRATOR</span> = <span class="str">"Alice"</span>
+  <span class="kw">CUT TO</span> Greet(guest)
+<span class="kw">FADE OUT.</span></pre>
+      </div>
+      <div class="panel">
+        <h3>How It Works</h3>
+        <ul>
+          <li><span class="kw">SCENE: Greet</span> defines a reusable function named <em>Greet</em>.</li>
+          <li><span class="kw">CAST: name AS NARRATOR</span> — the scene takes one string parameter. Actors are <em>cast</em> in a role.</li>
+          <li><span class="kw">CUT TO Greet(guest)</span> — calls the scene with <em>guest</em> as the argument. A film <em>cut to</em> jumps to a new scene.</li>
+          <li>Scene variables are <strong>local</strong> — <em>name</em> only exists inside <em>Greet</em>.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 11. PROGRAM 4: THE COUNTDOWN ──────────────── -->
+  <div class="slide">
+    <h1>Program 4 — The Countdown</h1>
+    <div class="split full">
+      <div class="panel">
+        <div class="panel-label">countdown.scp</div>
+        <pre><span class="kw">SCRIPT:</span> The Countdown
+
+<span class="kw">OPENING CREDITS</span>
+  <span class="kw">CHARACTER</span> count <span class="kw">AS</span> <span class="typ">HERO</span> = <span class="num">10</span>
+
+<span class="kw">SCENE:</span> Launch Sequence
+  <span class="kw">MONTAGE</span> count <span class="kw">FROM</span> <span class="num">10</span> <span class="kw">TO</span> <span class="num">1</span>
+    <span class="kw">SAYS</span> count
+  <span class="kw">END MONTAGE</span>
+  <span class="kw">SHOUTS</span> <span class="str">"We have liftoff!"</span>
+
+<span class="kw">DIRECTOR'S CUT</span>
+  <span class="kw">CUT TO</span> Launch Sequence
+<span class="kw">FADE OUT.</span></pre>
+      </div>
+      <div class="panel">
+        <h3>How It Works</h3>
+        <ul>
+          <li><span class="kw">OPENING CREDITS</span> is global scope — sets the stage before any scene runs.</li>
+          <li><span class="kw">MONTAGE count FROM 10 TO 1</span> — a for loop that auto-decrements. A film montage compresses many moments into one sequence.</li>
+          <li><span class="kw">END MONTAGE</span> closes the loop block.</li>
+          <li><span class="kw">SHOUTS</span> writes to stderr with emphasis. Output is wrapped: <span class="mono">!! We have liftoff! !!</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 12. PROGRAM 5: THE AUDITION ───────────────── -->
+  <div class="slide">
+    <h1>Program 5 — The Audition</h1>
+    <div class="split full">
+      <div class="panel">
+        <div class="panel-label">audition.scp</div>
+        <pre><span class="kw">SCRIPT:</span> The Audition
+
+<span class="kw">SCENE:</span> Audition (<span class="kw">CAST:</span> score <span class="kw">AS</span> <span class="typ">HERO</span>)
+  <span class="kw">MEANWHILE</span> score &gt;= <span class="num">80</span>
+    <span class="kw">SAYS</span> <span class="str">"You got the part."</span>
+  <span class="kw">OTHERWISE</span>
+    <span class="kw">SAYS</span> <span class="str">"Better luck next time."</span>
+
+<span class="kw">DIRECTOR'S CUT</span>
+  <span class="kw">CHARACTER</span> applicant <span class="kw">AS</span> <span class="typ">HERO</span> = <span class="num">92</span>
+  <span class="kw">CUT TO</span> Audition(applicant)
+<span class="kw">FADE OUT.</span></pre>
+      </div>
+      <div class="panel">
+        <h3>How It Works</h3>
+        <ul>
+          <li><span class="kw">MEANWHILE score &gt;= 80</span> — an if statement. "Meanwhile" in film shows a conditional parallel reality.</li>
+          <li><span class="kw">OTHERWISE</span> — the else branch. Like cutting to the alternate outcome.</li>
+          <li>Indentation defines which statements belong to each branch — no braces or end markers.</li>
+          <li>With <em>applicant = 92</em>, the condition is true → prints <em>"You got the part."</em></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 13. PROGRAM 6: FIZZBUZZ ────────────────────── -->
+  <div class="slide">
+    <h1>Program 6 — FizzBuzz</h1>
+    <div class="split full">
+      <div class="panel">
+        <div class="panel-label">fizzbuzz.scp</div>
+        <pre style="font-size:0.8rem;"><span class="kw">SCRIPT:</span> FizzBuzz
+
+<span class="kw">OPENING CREDITS</span>
+  <span class="kw">CHARACTER</span> limit <span class="kw">AS</span> <span class="typ">HERO</span> = <span class="num">30</span>
+
+<span class="kw">SCENE:</span> CheckFizzBuzz (<span class="kw">CAST:</span> n <span class="kw">AS</span> <span class="typ">HERO</span>)
+  <span class="kw">CHARACTER</span> rem3 <span class="kw">AS</span> <span class="typ">HERO</span> = n % <span class="num">3</span>
+  <span class="kw">CHARACTER</span> rem5 <span class="kw">AS</span> <span class="typ">HERO</span> = n % <span class="num">5</span>
+  <span class="kw">MEANWHILE</span> rem3 == <span class="num">0</span>
+    <span class="kw">MEANWHILE</span> rem5 == <span class="num">0</span>
+      <span class="kw">SAYS</span> <span class="str">"FizzBuzz"</span>
+    <span class="kw">OTHERWISE</span>
+      <span class="kw">SAYS</span> <span class="str">"Fizz"</span>
+  <span class="kw">OTHERWISE</span>
+    <span class="kw">MEANWHILE</span> rem5 == <span class="num">0</span>
+      <span class="kw">SAYS</span> <span class="str">"Buzz"</span>
+    <span class="kw">OTHERWISE</span>
+      <span class="kw">SAYS</span> n
+
+<span class="kw">DIRECTOR'S CUT</span>
+  <span class="kw">MONTAGE</span> i <span class="kw">FROM</span> <span class="num">1</span> <span class="kw">TO</span> limit
+    <span class="kw">CUT TO</span> CheckFizzBuzz(i)
+  <span class="kw">END MONTAGE</span>
+<span class="kw">FADE OUT.</span></pre>
+      </div>
+      <div class="panel">
+        <h3>How It Works</h3>
+        <ul>
+          <li>Uses <strong>nested MEANWHILE/OTHERWISE</strong> to handle all three cases: divisible by both, by 3, by 5.</li>
+          <li><span class="mono">n % 3</span> and <span class="mono">n % 5</span> are stored as local HERO variables for clarity.</li>
+          <li>The <span class="kw">MONTAGE</span> calls <em>CheckFizzBuzz</em> for each <em>i</em> from 1 to 30 — 30 scene calls in one montage.</li>
+          <li>Demonstrates: modulo, nested conditionals, loop + scene call, global variable as loop bound.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 14. COMPLEX PROGRAM: CINEMA REPORT ────────── -->
+  <div class="slide">
+    <h1>Complex Program — The Grand Cinema Report</h1>
+    <div class="split full">
+      <div class="panel">
+        <h3>What It Does</h3>
+        <ul>
+          <li>Processes 5 film screenings and generates a full box-office report.</li>
+          <li>Calculates gross revenue per screening and assigns a <strong>4-tier verdict</strong>.</li>
+          <li>Tracks the highest-grossing screening using global state accumulation.</li>
+          <li>Wraps each screening in <span class="kw">PLOT TWIST</span> error handling.</li>
+          <li>Prints a final summary with total revenue and sequel greenlight verdict.</li>
+        </ul>
+        <h3 style="margin-top:14px;">Features Used</h3>
+        <ul>
+          <li>Multiple interdependent scenes with <span class="kw">RETURN</span> values</li>
+          <li>Global state mutated across scene calls</li>
+          <li>3-tier nested <span class="kw">MEANWHILE/OTHERWISE</span></li>
+          <li><span class="kw">PLOT TWIST</span> (try/catch) wrapping scene calls</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <div class="panel-label">cinema_report.scp — scene structure</div>
+        <pre style="font-size:0.8rem;"><span class="kw">SCENE:</span> CalcRevenue   <span class="cmt">← returns tickets * price</span>
+<span class="kw">SCENE:</span> GetVerdict   <span class="cmt">← 4-tier verdict check</span>
+<span class="kw">SCENE:</span> TrackHighest <span class="cmt">← updates global max</span>
+<span class="kw">SCENE:</span> ReportScreening
+  <span class="cmt">← calls all 3 above, updates globals</span>
+<span class="kw">SCENE:</span> SafeScreening
+  <span class="kw">PLOT TWIST</span>
+    <span class="kw">CUT TO</span> ReportScreening(...)
+  <span class="kw">OTHERWISE</span>
+    <span class="kw">SAYS</span> <span class="str">"[ERROR] Screening failed"</span>
+
+<span class="kw">DIRECTOR'S CUT</span>
+  <span class="kw">CUT TO</span> SafeScreening(<span class="num">1</span>, <span class="num">320</span>, <span class="num">18</span>)
+  <span class="kw">CUT TO</span> SafeScreening(<span class="num">2</span>, <span class="num">510</span>, <span class="num">15</span>)
+  <span class="kw">CUT TO</span> SafeScreening(<span class="num">3</span>, <span class="num">95</span>,  <span class="num">22</span>)
+  <span class="kw">CUT TO</span> SafeScreening(<span class="num">4</span>, <span class="num">640</span>, <span class="num">14</span>)
+  <span class="kw">CUT TO</span> SafeScreening(<span class="num">5</span>, <span class="num">210</span>, <span class="num">20</span>)</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 15. INTERPRETER ARCHITECTURE ──────────────── -->
+  <div class="slide center">
+    <h1>Interpreter Architecture</h1>
+    <div class="arch">
+      <div class="arch-step">
+        <h3>Lexer</h3>
+        <span class="mono" style="font-size:0.82rem;">tokenize()</span>
+        <p>Regex-based. Handles multi-word keywords like CUT TO, DIRECTOR'S CUT. Produces a flat token stream.</p>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-step">
+        <h3>Parser</h3>
+        <span class="mono" style="font-size:0.82rem;">Parser class</span>
+        <p>Recursive descent. Builds an AST. Handles expressions, nested blocks, scenes, loops, and conditionals.</p>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-step">
+        <h3>Interpreter</h3>
+        <span class="mono" style="font-size:0.82rem;">Interpreter class</span>
+        <p>Tree-walking executor. Two-level scope: local → global. RETURN implemented via ReturnSignal exception.</p>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:24px;text-align:left;max-width:900px;font-family:'Courier Prime',monospace;font-size:0.82rem;line-height:1.8;">
+      interpreter.py<br>
+      &nbsp;├── tokenize() &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Lexer<br>
+      &nbsp;├── Parser &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; parse_program / parse_scene / parse_block / parse_statement / parse_expr<br>
+      &nbsp;└── Interpreter &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _eval() / _exec() / _call_scene() / _resolve()
+    </div>
+  </div>
+
+  <!-- ── 16. DEMO: HELLO WORLD ──────────────────────── -->
+  <div class="slide">
+    <h1>Demo 1 — Hello World</h1>
+    <div class="split full">
+      <div class="panel">
+        <div class="panel-label">hello_world.scp</div>
+        <pre><span class="kw">SCRIPT:</span> Hello World
+
+<span class="kw">DIRECTOR'S CUT</span>
+  <span class="kw">CHARACTER</span> lead <span class="kw">AS</span> <span class="typ">NARRATOR</span> = <span class="str">"Hello World!"</span>
+  lead <span class="kw">SAYS LINE</span>
+<span class="kw">FADE OUT.</span></pre>
+      </div>
+      <div class="panel">
+        <div class="panel-label">output</div>
+        <div class="terminal">
+<span class="cmd">$ python3 interpreter.py hello_world.scp</span>==================================================
+  SCRIPT: Hello World
+==================================================
+
+  lead: "Hello World!"
+
+==================================================
+  FADE OUT.
+==================================================</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 17. DEMO: SIMPLE MATH ──────────────────────── -->
+  <div class="slide">
+    <h1>Demo 2 — Simple Math</h1>
+    <div class="split full">
+      <div class="panel">
+        <div class="panel-label">math.scp</div>
+        <pre><span class="kw">SCRIPT:</span> Simple Math
+
+<span class="kw">DIRECTOR'S CUT</span>
+  <span class="kw">CHARACTER</span> a <span class="kw">AS</span> <span class="typ">HERO</span> = <span class="num">10</span>
+  <span class="kw">CHARACTER</span> b <span class="kw">AS</span> <span class="typ">HERO</span> = <span class="num">5</span>
+  <span class="kw">CHARACTER</span> total <span class="kw">AS</span> <span class="typ">HERO</span> = a + b
+  <span class="kw">CHARACTER</span> diff  <span class="kw">AS</span> <span class="typ">HERO</span> = a - b
+  <span class="kw">SAYS</span> <span class="str">"Sum:"</span>
+  total <span class="kw">SAYS LINE</span>
+  <span class="kw">SAYS</span> <span class="str">"Difference:"</span>
+  diff <span class="kw">SAYS LINE</span>
+<span class="kw">FADE OUT.</span></pre>
+      </div>
+      <div class="panel">
+        <div class="panel-label">output</div>
+        <div class="terminal">
+<span class="cmd">$ python3 interpreter.py math.scp</span>==================================================
+  SCRIPT: Simple Math
+==================================================
+
+  Sum:
+  total: "15"
+  Difference:
+  diff: "5"
+
+==================================================
+  FADE OUT.
+==================================================</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 18. DEMO: PERSONAL GREETING ───────────────── -->
+  <div class="slide">
+    <h1>Demo 3 — Personal Greeting</h1>
+    <div class="split full">
+      <div class="panel">
+        <div class="panel-label">greeting.scp</div>
+        <pre><span class="kw">SCRIPT:</span> Personal Greeting
+
+<span class="kw">SCENE:</span> Greet (<span class="kw">CAST:</span> name <span class="kw">AS</span> <span class="typ">NARRATOR</span>)
+  <span class="kw">SAYS</span> <span class="str">"Welcome to the show,"</span>
+  name <span class="kw">SAYS LINE</span>
+
+<span class="kw">DIRECTOR'S CUT</span>
+  <span class="kw">CHARACTER</span> guest <span class="kw">AS</span> <span class="typ">NARRATOR</span> = <span class="str">"Alice"</span>
+  <span class="kw">CUT TO</span> Greet(guest)
+<span class="kw">FADE OUT.</span></pre>
+      </div>
+      <div class="panel">
+        <div class="panel-label">output</div>
+        <div class="terminal">
+<span class="cmd">$ python3 interpreter.py greeting.scp</span>==================================================
+  SCRIPT: Personal Greeting
+==================================================
+
+  Welcome to the show,
+  name: "Alice"
+
+==================================================
+  FADE OUT.
+==================================================</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 19. DEMO: THE COUNTDOWN ───────────────────── -->
+  <div class="slide">
+    <h1>Demo 4 — The Countdown</h1>
+    <div class="split full">
+      <div class="panel">
+        <div class="panel-label">countdown.scp</div>
+        <pre><span class="kw">SCRIPT:</span> The Countdown
+
+<span class="kw">OPENING CREDITS</span>
+  <span class="kw">CHARACTER</span> count <span class="kw">AS</span> <span class="typ">HERO</span> = <span class="num">10</span>
+
+<span class="kw">SCENE:</span> Launch Sequence
+  <span class="kw">MONTAGE</span> count <span class="kw">FROM</span> <span class="num">10</span> <span class="kw">TO</span> <span class="num">1</span>
+    <span class="kw">SAYS</span> count
+  <span class="kw">END MONTAGE</span>
+  <span class="kw">SHOUTS</span> <span class="str">"We have liftoff!"</span>
+
+<span class="kw">DIRECTOR'S CUT</span>
+  <span class="kw">CUT TO</span> Launch Sequence
+<span class="kw">FADE OUT.</span></pre>
+      </div>
+      <div class="panel">
+        <div class="panel-label">output</div>
+        <div class="terminal">
+<span class="cmd">$ python3 interpreter.py countdown.scp</span>==================================================
+  SCRIPT: The Countdown
+==================================================
+
+  10
+  9
+  8
+  7
+  6
+  5
+  4
+  3
+  2
+  1
+  !! We have liftoff! !!
+
+==================================================
+  FADE OUT.
+==================================================</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 20. DEMO: THE AUDITION ─────────────────────── -->
+  <div class="slide">
+    <h1>Demo 5 — The Audition</h1>
+    <div class="split full">
+      <div class="panel">
+        <div class="panel-label">audition.scp</div>
+        <pre><span class="kw">SCRIPT:</span> The Audition
+
+<span class="kw">SCENE:</span> Audition (<span class="kw">CAST:</span> score <span class="kw">AS</span> <span class="typ">HERO</span>)
+  <span class="kw">MEANWHILE</span> score &gt;= <span class="num">80</span>
+    <span class="kw">SAYS</span> <span class="str">"You got the part."</span>
+  <span class="kw">OTHERWISE</span>
+    <span class="kw">SAYS</span> <span class="str">"Better luck next time."</span>
+
+<span class="kw">DIRECTOR'S CUT</span>
+  <span class="kw">CHARACTER</span> applicant <span class="kw">AS</span> <span class="typ">HERO</span> = <span class="num">92</span>
+  <span class="kw">CUT TO</span> Audition(applicant)
+<span class="kw">FADE OUT.</span></pre>
+      </div>
+      <div class="panel">
+        <div class="panel-label">output</div>
+        <div class="terminal">
+<span class="cmd">$ python3 interpreter.py audition.scp</span>==================================================
+  SCRIPT: The Audition
+==================================================
+
+  You got the part.
+
+==================================================
+  FADE OUT.
+==================================================</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 21. DEMO: FIZZBUZZ ─────────────────────────── -->
+  <div class="slide">
+    <h1>Demo 6 — FizzBuzz</h1>
+    <div class="split full">
+      <div class="panel">
+        <div class="panel-label">fizzbuzz.scp (core logic)</div>
+        <pre style="font-size:0.82rem;"><span class="kw">SCENE:</span> CheckFizzBuzz (<span class="kw">CAST:</span> n <span class="kw">AS</span> <span class="typ">HERO</span>)
+  <span class="kw">CHARACTER</span> rem3 <span class="kw">AS</span> <span class="typ">HERO</span> = n % <span class="num">3</span>
+  <span class="kw">CHARACTER</span> rem5 <span class="kw">AS</span> <span class="typ">HERO</span> = n % <span class="num">5</span>
+  <span class="kw">MEANWHILE</span> rem3 == <span class="num">0</span>
+    <span class="kw">MEANWHILE</span> rem5 == <span class="num">0</span>
+      <span class="kw">SAYS</span> <span class="str">"FizzBuzz"</span>
+    <span class="kw">OTHERWISE</span>
+      <span class="kw">SAYS</span> <span class="str">"Fizz"</span>
+  <span class="kw">OTHERWISE</span>
+    <span class="kw">MEANWHILE</span> rem5 == <span class="num">0</span>
+      <span class="kw">SAYS</span> <span class="str">"Buzz"</span>
+    <span class="kw">OTHERWISE</span>
+      <span class="kw">SAYS</span> n
+
+<span class="kw">DIRECTOR'S CUT</span>
+  <span class="kw">MONTAGE</span> i <span class="kw">FROM</span> <span class="num">1</span> <span class="kw">TO</span> limit
+    <span class="kw">CUT TO</span> CheckFizzBuzz(i)
+  <span class="kw">END MONTAGE</span></pre>
+      </div>
+      <div class="panel">
+        <div class="panel-label">output</div>
+        <div class="terminal">
+<span class="cmd">$ python3 interpreter.py fizzbuzz.scp</span>=== FizzBuzz: 1 to 30 ===
+  1
+  2
+  Fizz
+  4
+  Buzz
+  Fizz
+  7
+  8
+  Fizz
+  Buzz
+  11
+  Fizz
+  13
+  14
+  FizzBuzz
+  16
+  17
+  Fizz
+  19
+  Buzz
+  Fizz
+  22
+  23
+  Fizz
+  Buzz
+  26
+  Fizz
+  28
+  29
+  FizzBuzz
+=== Scene. ===</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 22. DEMO: CINEMA REPORT ───────────────────── -->
+  <div class="slide">
+    <h1>Demo 7 — The Grand Cinema Report</h1>
+    <div class="split full">
+      <div class="panel">
+        <div class="panel-label">cinema_report.scp (excerpt)</div>
+        <pre style="font-size:0.78rem;"><span class="kw">SCENE:</span> CalcRevenue (<span class="kw">CAST:</span> tickets <span class="kw">AS</span> <span class="typ">HERO</span>, price <span class="kw">AS</span> <span class="typ">HERO</span>)
+  <span class="kw">CHARACTER</span> revenue <span class="kw">AS</span> <span class="typ">HERO</span> = tickets * price
+  <span class="kw">RETURN</span> revenue
+
+<span class="kw">SCENE:</span> GetVerdict (<span class="kw">CAST:</span> revenue <span class="kw">AS</span> <span class="typ">HERO</span>)
+  <span class="kw">MEANWHILE</span> revenue &gt;= <span class="num">8000</span>
+    <span class="kw">SAYS</span> <span class="str">"BLOCKBUSTER HIT"</span>
+  <span class="kw">OTHERWISE</span>
+    <span class="kw">MEANWHILE</span> revenue &gt;= <span class="num">4000</span>
+      <span class="kw">SAYS</span> <span class="str">"Solid Performer"</span>
+    <span class="kw">OTHERWISE</span>
+      <span class="kw">SAYS</span> <span class="str">"Limited Success"</span>
+
+<span class="kw">SCENE:</span> SafeScreening (...)
+  <span class="kw">PLOT TWIST</span>
+    <span class="kw">CUT TO</span> ReportScreening(...)
+  <span class="kw">OTHERWISE</span>
+    <span class="kw">SAYS</span> <span class="str">"[ERROR] Screening failed"</span></pre>
+      </div>
+      <div class="panel">
+        <div class="panel-label">output</div>
+        <div class="terminal" style="font-size:0.78rem;">
+<span class="cmd">$ python3 interpreter.py cinema_report.scp</span>=========================================
+   OPENING WEEKEND REPORT
+=========================================
+--- Screening #  num: "1"
+  Gross Revenue: $  revenue: "5760"
+  Verdict: Solid Performer
+--- Screening #  num: "2"
+  Gross Revenue: $  revenue: "7650"
+  Verdict: Solid Performer
+--- Screening #  num: "3"
+  Gross Revenue: $  revenue: "2090"
+  Verdict: Limited Success
+--- Screening #  num: "4"
+  Gross Revenue: $  revenue: "8960"
+  Verdict: BLOCKBUSTER HIT
+--- Screening #  num: "5"
+  Gross Revenue: $  revenue: "4200"
+  Verdict: Solid Performer
+=========================================
+   FINAL SUMMARY
+=========================================
+  Total Revenue: $  total_revenue: "28660"
+  VERDICT: GREENLIGHT THE SEQUEL!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 23. CLOSING ───────────────────────────────── -->
+  <div class="slide center">
+    <div style="width:50px;height:1px;background:var(--gold);margin:0 auto 36px;opacity:0.4;"></div>
+    <h1 class="hero" style="font-size:4.5rem;letter-spacing:0.3em;">FADE OUT.</h1>
+    <p class="subtitle" style="margin-top:18px;">Scriptor — CS 420 Final Project — Spring 2026</p>
+    <p style="font-size:0.85rem;color:var(--dim);margin-top:12px;font-family:'Courier Prime',monospace;">
+      interpreter.py &nbsp;·&nbsp; 7 programs &nbsp;·&nbsp; github.com/Markgugg/dom-final-movie
+    </p>
+    <div style="width:50px;height:1px;background:var(--gold);margin:28px auto 0;opacity:0.4;"></div>
+  </div>
+
+</div><!-- /deck -->
+
+<div class="nav">
+  <button onclick="move(-1)">← PREV</button>
+  <span class="counter" id="counter">1 / 23</span>
+  <button onclick="move(1)">NEXT →</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total  = slides.length;
+  let cur = 0;
+
+  function show(n) {
+    slides[cur].classList.remove('active');
+    cur = Math.max(0, Math.min(total - 1, n));
+    slides[cur].classList.add('active');
+    document.getElementById('counter').textContent = (cur + 1) + ' / ' + total;
+    document.getElementById('progress').style.width = ((cur + 1) / total * 100) + '%';
+    document.getElementById('slide-label').textContent =
+      cur === 0          ? 'CS 420 — Spring 2026' :
+      cur === total - 1  ? 'SCRIPTOR'             :
+                           'Slide ' + (cur + 1) + ' of ' + total;
+  }
+
+  function move(dir) { show(cur + dir); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'ArrowDown') { e.preventDefault(); move(1); }
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')                    { e.preventDefault(); move(-1); }
+    if (e.key === 'Home') show(0);
+    if (e.key === 'End')  show(total - 1);
+  });
+
+  document.getElementById('counter').textContent = '1 / ' + total;
+  document.getElementById('progress').style.width = (1 / total * 100) + '%';
+</script>
+
+</body>
+</html>
