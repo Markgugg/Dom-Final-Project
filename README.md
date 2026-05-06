@@ -182,11 +182,11 @@ CUT TO Greet("World")
 
 Return a value:
 
-```
+``
 SCENE: Double (CAST: n AS HERO)
   CHARACTER result AS HERO = n * 2
   RETURN result
-```
+``
 
 Capture a return value:
 
@@ -205,7 +205,7 @@ OTHERWISE
   SAYS "Something went wrong."
 ```
 
----
+--
 
 ### Arithmetic & Comparison
 
