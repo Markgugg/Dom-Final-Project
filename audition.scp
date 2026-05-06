@@ -1,0 +1,12 @@
+SCRIPT: The Audition
+
+SCENE: Audition (CAST: score AS HERO)
+  MEANWHILE score >= 80
+    SAYS "You got the part."
+  OTHERWISE
+    SAYS "Better luck next time."
+
+DIRECTOR'S CUT
+  CHARACTER applicant AS HERO = 92
+  CUT TO Audition(applicant)
+FADE OUT.

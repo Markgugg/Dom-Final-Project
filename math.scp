@@ -1,0 +1,12 @@
+SCRIPT: Simple Math
+
+DIRECTOR'S CUT
+  CHARACTER a AS HERO = 10
+  CHARACTER b AS HERO = 5
+  CHARACTER total AS HERO = a + b
+  CHARACTER diff AS HERO = a - b
+  SAYS "Sum:"
+  total SAYS LINE
+  SAYS "Difference:"
+  diff SAYS LINE
+FADE OUT.

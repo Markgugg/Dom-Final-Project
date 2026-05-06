@@ -1,0 +1,27 @@
+SCRIPT: FizzBuzz
+
+OPENING CREDITS
+  CHARACTER limit AS HERO = 30
+
+SCENE: CheckFizzBuzz (CAST: n AS HERO)
+  CHARACTER rem3 AS HERO = n % 3
+  CHARACTER rem5 AS HERO = n % 5
+  MEANWHILE rem3 == 0
+    MEANWHILE rem5 == 0
+      SAYS "FizzBuzz"
+    OTHERWISE
+      SAYS "Fizz"
+  OTHERWISE
+    MEANWHILE rem5 == 0
+      SAYS "Buzz"
+    OTHERWISE
+      SAYS n
+
+DIRECTOR'S CUT
+  SAYS "=== FizzBuzz: 1 to 30 ==="
+  MONTAGE i FROM 1 TO limit
+    CUT TO CheckFizzBuzz(i)
+  END MONTAGE
+  SAYS "=== Scene. ==="
+
+FADE OUT.

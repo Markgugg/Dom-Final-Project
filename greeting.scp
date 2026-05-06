@@ -1,0 +1,10 @@
+SCRIPT: Personal Greeting
+
+SCENE: Greet (CAST: name AS NARRATOR)
+  SAYS "Welcome to the show,"
+  name SAYS LINE
+
+DIRECTOR'S CUT
+  CHARACTER guest AS NARRATOR = "Alice"
+  CUT TO Greet(guest)
+FADE OUT.

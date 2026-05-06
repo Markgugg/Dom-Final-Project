@@ -1,0 +1,80 @@
+SCRIPT: The Grand Cinema Report
+
+OPENING CREDITS
+  CHARACTER total_revenue AS HERO = 0
+  CHARACTER total_screenings AS HERO = 0
+  CHARACTER highest_revenue AS HERO = 0
+
+SCENE: CalcRevenue (CAST: tickets AS HERO, price AS HERO)
+  CHARACTER revenue AS HERO = tickets * price
+  RETURN revenue
+
+SCENE: GetVerdict (CAST: revenue AS HERO)
+  MEANWHILE revenue >= 8000
+    SAYS "BLOCKBUSTER HIT"
+  OTHERWISE
+    MEANWHILE revenue >= 4000
+      SAYS "Solid Performer"
+    OTHERWISE
+      MEANWHILE revenue >= 1500
+        SAYS "Limited Success"
+      OTHERWISE
+        SAYS "Box Office Flop"
+
+SCENE: TrackHighest (CAST: revenue AS HERO)
+  MEANWHILE revenue >= highest_revenue
+    highest_revenue = revenue
+
+SCENE: ReportScreening (CAST: num AS HERO, tickets AS HERO, price AS HERO)
+  SAYS "--- Screening #"
+  num SAYS LINE
+  CHARACTER revenue AS HERO = CalcRevenue(tickets, price)
+  SAYS "  Tickets Sold:"
+  tickets SAYS LINE
+  SAYS "  Price Per Ticket: $"
+  price SAYS LINE
+  SAYS "  Gross Revenue: $"
+  revenue SAYS LINE
+  SAYS "  Verdict:"
+  CUT TO GetVerdict(revenue)
+  CUT TO TrackHighest(revenue)
+  total_revenue = total_revenue + revenue
+  total_screenings = total_screenings + 1
+
+SCENE: SafeScreening (CAST: num AS HERO, tickets AS HERO, price AS HERO)
+  PLOT TWIST
+    CUT TO ReportScreening(num, tickets, price)
+  OTHERWISE
+    SAYS "  [ERROR] Screening failed to process"
+
+DIRECTOR'S CUT
+  SAYS "========================================="
+  SAYS "   OPENING WEEKEND REPORT"
+  SAYS "========================================="
+
+  CUT TO SafeScreening(1, 320, 18)
+  CUT TO SafeScreening(2, 510, 15)
+  CUT TO SafeScreening(3, 95, 22)
+  CUT TO SafeScreening(4, 640, 14)
+  CUT TO SafeScreening(5, 210, 20)
+
+  SAYS "========================================="
+  SAYS "   FINAL SUMMARY"
+  SAYS "========================================="
+
+  SAYS "Total Screenings:"
+  total_screenings SAYS LINE
+  SAYS "Total Revenue: $"
+  total_revenue SAYS LINE
+  SAYS "Best Single Screening: $"
+  highest_revenue SAYS LINE
+
+  MEANWHILE total_revenue >= 20000
+    SAYS "VERDICT: GREENLIGHT THE SEQUEL!"
+  OTHERWISE
+    MEANWHILE total_revenue >= 10000
+      SAYS "VERDICT: Profitable run."
+    OTHERWISE
+      SAYS "VERDICT: Back to the drawing board."
+
+FADE OUT.

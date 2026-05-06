@@ -1,0 +1,6 @@
+SCRIPT: Hello World
+
+DIRECTOR'S CUT
+  CHARACTER lead AS NARRATOR = "Hello, World!"
+  lead SAYS LINE
+FADE OUT.

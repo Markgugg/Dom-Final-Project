@@ -1,0 +1,14 @@
+SCRIPT: The Countdown
+
+OPENING CREDITS
+  CHARACTER count AS HERO = 10
+
+SCENE: Launch Sequence
+  MONTAGE count FROM 10 TO 1
+    SAYS count
+  END MONTAGE
+  SHOUTS "We have liftoff!"
+
+DIRECTOR'S CUT
+  CUT TO Launch Sequence
+FADE OUT.
