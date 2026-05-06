@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Scriptor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Raleway:wght@400;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      background: #0d0d0d;
+      color: #e8dcc8;
+      font-family: 'Raleway', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 70px 24px 40px;
+      text-align: center;
+    }
+
+    h1 {
+      font-family: 'Special Elite', serif;
+      font-size: 5rem;
+      letter-spacing: 0.35em;
+      color: #f5c842;
+      margin: 0 0 8px;
+      text-shadow: 0 0 40px rgba(245, 200, 66, 0.25);
+    }
+
+    .slogan {
+      font-size: 1.1rem;
+      color: #9a8e7e;
+      margin-bottom: 40px;
+      font-style: italic;
+    }
+
+    .buttons { margin-bottom: 52px; }
+
+    .btn {
+      display: inline-block;
+      padding: 13px 30px;
+      border-radius: 3px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1rem;
+      margin: 5px;
+      letter-spacing: 0.04em;
+      transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.82; }
+    .btn-primary { background: #f5c842; color: #0d0d0d; }
+    .btn-secondary { background: #1f1f1f; color: #e8dcc8; border: 1px solid #333; }
+
+    hr {
+      border: none;
+      border-top: 1px solid #1f1f1f;
+      margin: 44px 0;
+    }
+
+    .example { text-align: left; }
+
+    h3 {
+      font-family: 'Special Elite', serif;
+      color: #f5c842;
+      letter-spacing: 0.08em;
+      font-size: 1.35rem;
+      margin: 0 0 10px;
+    }
+
+    .label {
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.82rem;
+      color: #555;
+      margin-bottom: 5px;
+    }
+
+    pre {
+      background: #141414;
+      border: 1px solid #222;
+      border-left: 3px solid #f5c842;
+      padding: 18px 22px;
+      font-family: 'Courier Prime', 'Courier New', monospace;
+      font-size: 0.92rem;
+      line-height: 1.65;
+      color: #e8dcc8;
+      overflow-x: auto;
+      border-radius: 2px;
+      margin: 0 0 14px;
+    }
+
+    .kw  { color: #f5c842; font-weight: bold; }
+    .str { color: #7ecf8e; }
+    .typ { color: #89b4fa; }
+    .cmt { color: #444; font-style: italic; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      margin-top: 6px;
+    }
+    th {
+      text-align: left;
+      color: #f5c842;
+      font-family: 'Special Elite', serif;
+      letter-spacing: 0.04em;
+      padding: 8px 12px;
+      border-bottom: 1px solid #222;
+    }
+    td {
+      padding: 7px 12px;
+      border-bottom: 1px solid #181818;
+      color: #b8b0a0;
+    }
+    td:first-child {
+      font-family: 'Courier Prime', monospace;
+      color: #f5c842;
+      white-space: nowrap;
+    }
+
+    .footer {
+      margin-top: 60px;
+      padding-top: 18px;
+      border-top: 1px solid #181818;
+      color: #333;
+      font-size: 0.82rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer a { color: #555; text-decoration: none; }
+    .footer a:hover { color: #f5c842; }
+    .footer blockquote {
+      margin: 0;
+      font-family: 'Special Elite', serif;
+      font-size: 0.85rem;
+      color: #333;
+      letter-spacing: 0.05em;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <h1>SCRIPTOR</h1>
+  <p class="slogan">A programming language written like a movie.</p>
+
+  <div class="buttons">
+    <a href="https://github.com/Markgugg/dom-final-movie" class="btn btn-primary">Source on GitHub</a>
+  </div>
+
+  <hr>
+
+  <div class="example">
+
+    <h3>Try it yourself</h3>
+    <div class="label">hello_world.scp</div>
+    <pre><span class="kw">SCRIPT:</span> Hello World
+
+<span class="kw">DIRECTOR'S CUT</span>
+  <span class="kw">CHARACTER</span> lead <span class="kw">AS</span> <span class="typ">NARRATOR</span> = <span class="str">"Hello, World!"</span>
+  lead <span class="kw">SAYS LINE</span>
+<span class="kw">FADE OUT.</span></pre>
+
+    <pre>python3 interpreter.py hello_world.scp</pre>
+
+    <hr>
+
+    <h3>FizzBuzz</h3>
+    <div class="label">fizzbuzz.scp</div>
+    <pre><span class="kw">SCRIPT:</span> FizzBuzz
+
+<span class="kw">OPENING CREDITS</span>
+  <span class="kw">CHARACTER</span> limit <span class="kw">AS</span> <span class="typ">HERO</span> = 30
+
+<span class="kw">SCENE:</span> CheckFizzBuzz (<span class="kw">CAST:</span> n <span class="kw">AS</span> <span class="typ">HERO</span>)
+  <span class="kw">CHARACTER</span> rem3 <span class="kw">AS</span> <span class="typ">HERO</span> = n % 3
+  <span class="kw">CHARACTER</span> rem5 <span class="kw">AS</span> <span class="typ">HERO</span> = n % 5
+  <span class="kw">MEANWHILE</span> rem3 == 0
+    <span class="kw">MEANWHILE</span> rem5 == 0
+      <span class="kw">SAYS</span> <span class="str">"FizzBuzz"</span>
+    <span class="kw">OTHERWISE</span>
+      <span class="kw">SAYS</span> <span class="str">"Fizz"</span>
+  <span class="kw">OTHERWISE</span>
+    <span class="kw">MEANWHILE</span> rem5 == 0
+      <span class="kw">SAYS</span> <span class="str">"Buzz"</span>
+    <span class="kw">OTHERWISE</span>
+      <span class="kw">SAYS</span> n
+
+<span class="kw">DIRECTOR'S CUT</span>
+  <span class="kw">MONTAGE</span> i <span class="kw">FROM</span> 1 <span class="kw">TO</span> limit
+    <span class="kw">CUT TO</span> CheckFizzBuzz(i)
+  <span class="kw">END MONTAGE</span>
+<span class="kw">FADE OUT.</span></pre>
+
+    <hr>
+
+    <h3>Language Reference</h3>
+    <table>
+      <tr><th>Keyword</th><th>Concept</th></tr>
+      <tr><td>SCENE</td><td>Function / block</td></tr>
+      <tr><td>CHARACTER</td><td>Variable declaration</td></tr>
+      <tr><td>SAYS</td><td>print to stdout</td></tr>
+      <tr><td>SHOUTS</td><td>print to stderr</td></tr>
+      <tr><td>MEANWHILE</td><td>if statement</td></tr>
+      <tr><td>OTHERWISE</td><td>else</td></tr>
+      <tr><td>MONTAGE</td><td>for loop</td></tr>
+      <tr><td>CUT TO</td><td>function call</td></tr>
+      <tr><td>DIRECTOR'S CUT</td><td>main() / entry point</td></tr>
+      <tr><td>OPENING CREDITS</td><td>global scope</td></tr>
+      <tr><td>PLOT TWIST</td><td>try / catch</td></tr>
+      <tr><td>FADE OUT.</td><td>end of program</td></tr>
+      <tr><td>RETURN</td><td>return value from scene</td></tr>
+    </table>
+
+    <hr>
+
+    <h3>Roles (Data Types)</h3>
+    <table>
+      <tr><th>Role</th><th>Type</th><th>Example</th></tr>
+      <tr><td>HERO</td><td>integer / number</td><td>42, 3.14</td></tr>
+      <tr><td>NARRATOR</td><td>string</td><td>"Hello"</td></tr>
+      <tr><td>VILLAIN</td><td>boolean</td><td>VILLAIN_TRUE, VILLAIN_FALSE</td></tr>
+      <tr><td>EXTRA</td><td>null / void</td><td>(no value)</td></tr>
+    </table>
+
+  </div>
+
+  <div class="footer">
+    <span>by <a href="https://github.com/Markgugg">@Markgugg</a> &middot; CS 420 Spring 2026</span>
+    <blockquote>FADE OUT.</blockquote>
+  </div>
+
+</div>
+</body>
+</html>
